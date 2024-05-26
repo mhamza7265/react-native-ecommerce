@@ -1,12 +1,4 @@
-import {
-  View,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  TouchableNativeFeedback,
-  Pressable,
-} from "react-native";
+import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { useFonts } from "expo-font";
 import Input from "../components/common/Input";
 import { useForm } from "react-hook-form";
