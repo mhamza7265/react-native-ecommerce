@@ -19,7 +19,10 @@ function Header() {
         <TouchableOpacity style={{ marginRight: 10 }}>
           <FontAwesome name="heart" size={20} style={{ color: "#3BB77E" }} />
         </TouchableOpacity>
-        <TouchableOpacity style={{ marginRight: 10 }}>
+        <TouchableOpacity
+          style={{ marginRight: 10 }}
+          onPress={() => navigation.navigate("Cart")}
+        >
           <FontAwesome
             name="shopping-cart"
             size={20}
@@ -28,6 +31,12 @@ function Header() {
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate("Login")}>
           <Text style={{ fontSize: 12 }}>Login</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Profile")}
+          style={{ marginLeft: 5 }}
+        >
+          <Text style={{ fontSize: 12 }}>Profile</Text>
         </TouchableOpacity>
       </View>
     </View>

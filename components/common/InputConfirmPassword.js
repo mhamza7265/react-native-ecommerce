@@ -60,10 +60,10 @@ const style = StyleSheet.create({
     borderColor: " #ececec",
     backgroundColor: "lightblue",
     borderWidth: 1,
-    height: 64,
+    height: 50,
     paddingLeft: 20,
     fontSize: 16,
-    borderRadius: 16,
+    borderRadius: 10,
     marginBottom: 15,
   },
 });
