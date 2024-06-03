@@ -9,12 +9,12 @@ const sendRequest = (method, url, payload, contentType, userType) => {
     axios
       .request(setRequestOptions(method, url, payload, contentType, userType))
       .then((response) => {
-        console.log(url, response);
+        // console.log(url, response);
         resolve(response.data);
       })
       .catch((error) => {
         if (error.response) {
-          console.log("APICatch - ", error.response.data);
+          // console.log("APICatch - ", error.response.data);
         }
         reject(error.response?.data.error);
       });

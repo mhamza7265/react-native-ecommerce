@@ -9,15 +9,20 @@ function Header() {
       <Image
         source={require("../../assets/images/logo.png")}
         style={{
-          width: 100,
-          height: 30,
+          width: 110,
+          height: 40,
           objectFit: "contain",
         }}
         onError={(error) => console.log("Error loading image:", error)}
       />
-      <View style={{ flexDirection: "row", marginTop: 5 }}>
-        <TouchableOpacity style={{ marginRight: 10 }}>
-          <FontAwesome name="heart" size={20} style={{ color: "#3BB77E" }} />
+      <View
+        style={{ flexDirection: "row", marginTop: 5, alignItems: "center" }}
+      >
+        <TouchableOpacity
+          style={{ marginRight: 10 }}
+          onPress={() => navigation.navigate("Wishlist")}
+        >
+          <FontAwesome name="heart" size={22} style={{ color: "#3BB77E" }} />
         </TouchableOpacity>
         <TouchableOpacity
           style={{ marginRight: 10 }}
@@ -25,7 +30,7 @@ function Header() {
         >
           <FontAwesome
             name="shopping-cart"
-            size={20}
+            size={24}
             style={{ color: "#3BB77E" }}
           />
         </TouchableOpacity>
@@ -49,7 +54,7 @@ const style = StyleSheet.create({
     justifyContent: "space-between",
     backgroundColor: "#fff",
     width: "100%",
-    padding: 10,
+    padding: 20,
     elevation: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },

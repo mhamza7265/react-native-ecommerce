@@ -78,7 +78,8 @@ function Billing() {
       >
         <Text style={{ fontWeight: "bold", fontSize: 20 }}>$38.84</Text>
         <TouchableOpacity
-          style={{ backgroundColor: "#3BB77E", padding: 10, borderRadius: 10 }}
+          style={style.button2}
+          onPress={() => navigation.navigate("Payment Method")}
         >
           <Text style={{ color: "#fff" }}>Confirm & Pay</Text>
         </TouchableOpacity>
@@ -130,6 +131,7 @@ const style = StyleSheet.create({
     borderRadius: 10,
     marginTop: 10,
   },
+  button2: { backgroundColor: "#3BB77E", padding: 10, borderRadius: 10 },
 });
 
 export default Billing;

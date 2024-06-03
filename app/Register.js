@@ -58,12 +58,12 @@ function Register({ navigation }) {
     <View>
       <ScrollView contentContainerStyle={style.container}>
         <Text style={style.text}>Register</Text>
-        <Text style={{ marginBottom: 15 }}>
-          Already have an account?
+        <View style={style.link1}>
+          <Text style={{ marginRight: 5 }}>Already have an account?</Text>
           <TouchableOpacity onPress={() => navigation.navigate("Login")}>
             <Text> Login</Text>
           </TouchableOpacity>
-        </Text>
+        </View>
         <Input
           placeholder="First Name"
           name="firstName"
@@ -182,6 +182,10 @@ const style = StyleSheet.create({
     marginLeft: "auto",
     marginRight: "auto",
     borderRadius: 100,
+  },
+  link1: {
+    flexDirection: "row",
+    marginBottom: 10,
   },
 });
 

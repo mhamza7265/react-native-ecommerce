@@ -23,12 +23,12 @@ function Login({ navigation }) {
     <View style={{ flex: 1, justifyContent: "center" }}>
       <View style={style.container}>
         <Text style={style.text}>Login</Text>
-        <Text style={{ marginBottom: 15 }}>
-          Don't have an account?{" "}
+        <View style={style.link1}>
+          <Text style={{ marginRight: 5 }}>Don't have an account?</Text>
           <TouchableOpacity onPress={() => navigation.navigate("Register")}>
             <Text>Create Here</Text>
           </TouchableOpacity>
-        </Text>
+        </View>
         <Input
           placeholder="Email"
           name="email"
@@ -95,6 +95,10 @@ const style = StyleSheet.create({
     backgroundColor: "#3bb77e",
     height: 50,
     padding: 10,
+  },
+  link1: {
+    flexDirection: "row",
+    marginBottom: 10,
   },
 });
 

@@ -10,11 +10,17 @@ import Slick from "react-native-slick";
 import Swiper from "react-native-swiper";
 import { useEffect, useState } from "react";
 import sendRequest from "../../../Utility/apiManager";
+import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import BASE_URL from "../../../Utility/config";
+import CategoryCard from "./CategoryCard";
 
 const { width } = Dimensions.get("window");
 
 function Categories() {
   const [categoriesList, setCategoriesList] = useState(null);
+  const navigation = useNavigation();
+
   useEffect(() => {
     sendRequest("get", "category")
       .then((res) => {
@@ -26,18 +32,14 @@ function Categories() {
         }
       })
       .catch((err) => {
-        console.log("err", err.error);
+        console.log("err", err);
       });
   }, []);
 
-  const data = [
-    { image: require("../../../assets/images/mobiles.jpg"), title: "MOBILES" },
-    { image: require("../../../assets/images/mobiles.jpg"), title: "MOBILES" },
-    { image: require("../../../assets/images/mobiles.jpg"), title: "MOBILES" },
-    { image: require("../../../assets/images/mobiles.jpg"), title: "MOBILES" },
-    { image: require("../../../assets/images/mobiles.jpg"), title: "MOBILES" },
-    { image: require("../../../assets/images/mobiles.jpg"), title: "MOBILES" },
-  ];
+  const getProducts = () => {
+    sendRequest("get");
+  };
+
   return (
     <View style={{ paddingTop: 15, flex: 1 }}>
       <Text style={style.text}>CATEGORIES</Text>
@@ -52,14 +54,15 @@ function Categories() {
         style={style.wrapper}
       > */}
       <View style={style.row}>
-        {data.map((item, i) => (
-          <TouchableOpacity key={i}>
-            <View style={style.card}>
-              <Image source={item.image} style={style.image} />
-              <Text style={style.cardText}>{item.title}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+        {categoriesList &&
+          categoriesList.map((item, i) => (
+            <CategoryCard
+              key={i}
+              id={item._id}
+              image={item.image}
+              name={item.name}
+            />
+          ))}
       </View>
       {/* </Swiper> */}
     </View>
@@ -92,6 +95,7 @@ const style = StyleSheet.create({
     width: width / 3.5,
     backgroundColor: "#fff",
     marginHorizontal: 5,
+    elevation: 5,
   },
   image: {
     width: "90%",

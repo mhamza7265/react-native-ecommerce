@@ -10,11 +10,14 @@ import {
 import { useState } from "react";
 import Slick from "react-native-slick";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { useSelector } from "react-redux";
+import BASE_URL from "../../../Utility/config";
 
 const { width } = Dimensions.get("window");
 function ProductDetails() {
   const [count, setCount] = useState(0);
   const [addToWishlist, setAddToWishlist] = useState(false);
+  const productDetail = useSelector((state) => state.productDetail.product);
 
   return (
     <ScrollView>
@@ -26,9 +29,9 @@ function ProductDetails() {
             showsButtons={false}
             autoplay={false}
           >
-            {[...Array(5)].map((item, i) => (
+            {productDetail?.images.map((item, i) => (
               <Image
-                source={require("../../../assets/images/motorcycle.jpg")}
+                source={{ uri: BASE_URL + "/" + item }}
                 style={style.image}
                 key={i}
               />
@@ -37,7 +40,7 @@ function ProductDetails() {
         </View>
         <View style={style.box}>
           <View style={style.innerBox}>
-            <Text style={style.textHead}>Android Smartphone</Text>
+            <Text style={style.textHead}>{productDetail?.name}</Text>
             <TouchableOpacity
               style={style.icon}
               onPress={() => setAddToWishlist(!addToWishlist)}
@@ -49,7 +52,10 @@ function ProductDetails() {
               />
             </TouchableOpacity>
             <Text style={style.text1}>
-              $25{"  "}
+              $
+              {productDetail?.price -
+                (productDetail?.price / 100) *
+                  productDetail.discount.discountValue}
               <Text
                 style={{
                   textDecorationLine: "line-through",
@@ -57,7 +63,7 @@ function ProductDetails() {
                   color: "gray",
                 }}
               >
-                $50
+                ${productDetail?.price}
               </Text>
             </Text>
           </View>
@@ -88,14 +94,7 @@ function ProductDetails() {
       <View style={style.box3}>
         <Text style={{ fontSize: 15, fontWeight: "bold" }}>Specifications</Text>
         <Text style={{ marginTop: 20, fontSize: 12, color: "gray" }}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget
-          lacus a dolor auctor rhoncus id vitae elit. Phasellus eu mi sed urna
-          elementum bibendum. Pellentesque vulputate a erat non fringilla. Etiam
-          id dui a augue condimentum pharetra. Mauris sed volutpat nibh, eu
-          placerat lorem. Nunc id pretium enim, non pharetra purus. Vivamus
-          hendrerit nulla nunc, vitae rhoncus mauris vestibulum et. Morbi luctus
-          egestas ipsum, non sodales nunc vulputate sit amet. Nunc eu maximus
-          elit, quis dapibus ante
+          {productDetail?.description}
         </Text>
       </View>
     </ScrollView>
@@ -122,8 +121,9 @@ const style = StyleSheet.create({
     width: width / 1.25,
     height: width / 1.25,
     margin: "auto",
-    objectFit: "cover",
+    objectFit: "contain",
     borderRadius: width / 2,
+    backgroundColor: "#fff",
   },
   box: {
     backgroundColor: "#E7E9F5",
