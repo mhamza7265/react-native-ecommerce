@@ -11,6 +11,10 @@ import sendRequest from "../../../Utility/apiManager";
 import { useDispatch } from "react-redux";
 import { addProducts } from "../../../redux/reducers/categoryProductsReducer";
 import { useNavigation } from "@react-navigation/native";
+import {
+  startLoader,
+  stopLoader,
+} from "../../../redux/reducers/activityReducer";
 
 const { width } = Dimensions.get("window");
 
@@ -19,14 +23,17 @@ function CategoryCard({ id, image, name }) {
   const navigation = useNavigation();
 
   const touchCategoryCard = () => {
+    dispatch(startLoader());
     sendRequest("get", `product/${id}`)
       .then((res) => {
+        dispatch(stopLoader());
         if (res.status) {
           dispatch(addProducts(res.data));
           navigation.navigate("Products");
         }
       })
       .catch((err) => {
+        dispatch(stopLoader());
         console.log("err", err);
       });
   };

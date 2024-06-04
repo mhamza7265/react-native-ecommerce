@@ -8,10 +8,16 @@ import {
 import { useEffect, useState } from "react";
 import sendRequest from "../../../Utility/apiManager";
 import ProductCard from "./ProductCard";
-
+import { useDispatch } from "react-redux";
+import {
+  startLoader,
+  stopLoader,
+} from "../../../redux/reducers/activityReducer";
 const { width } = Dimensions.get("window");
+
 function Products() {
   const [productsList, setProductsList] = useState(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     sendRequest("get", "products/listing?page=1")
@@ -28,8 +34,10 @@ function Products() {
   }, []);
 
   const loadMoreProducts = () => {
+    dispatch(startLoader());
     sendRequest("get", `products/listing?page=${productsList.page + 1}`)
       .then((res) => {
+        dispatch(stopLoader());
         if (res.status) {
           setProductsList({
             ...res.products,
@@ -38,6 +46,7 @@ function Products() {
         }
       })
       .catch((err) => {
+        dispatch(stopLoader());
         console.log("err", err);
       });
   };
@@ -49,6 +58,7 @@ function Products() {
         {productsList &&
           productsList?.docs.map((item, i) => (
             <ProductCard
+              key={i}
               id={item._id}
               images={item.images}
               name={item.name}

@@ -13,6 +13,10 @@ import sendRequest from "../../../Utility/apiManager";
 import { useDispatch } from "react-redux";
 import { addProductWithDetail } from "../../../redux/reducers/productDetailReducer";
 import { useNavigation } from "@react-navigation/native";
+import {
+  startLoader,
+  stopLoader,
+} from "../../../redux/reducers/activityReducer";
 
 const { width } = Dimensions.get("window");
 
@@ -21,14 +25,17 @@ function ProductCard({ id, images, name, price, discountValue }) {
   const navigation = useNavigation();
 
   const onPressProduct = () => {
+    dispatch(startLoader());
     sendRequest("get", `product/single/${id}`)
       .then((res) => {
+        dispatch(stopLoader());
         if (res.status) {
           dispatch(addProductWithDetail(res.data[0]));
           navigation.navigate("Product");
         }
       })
       .catch((err) => {
+        dispatch(stopLoader());
         console.log("err", err);
       });
   };

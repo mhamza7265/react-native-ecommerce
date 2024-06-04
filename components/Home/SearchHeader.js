@@ -11,6 +11,7 @@ import { addSearchSuggestions } from "../../redux/reducers/searchSuggestionsRedu
 import { useState } from "react";
 import { addSearchedProducts } from "../../redux/reducers/searchedProductsReducer";
 import { useNavigation } from "@react-navigation/native";
+import { startLoader, stopLoader } from "../../redux/reducers/activityReducer";
 
 function SearchHeader() {
   const dispatch = useDispatch();
@@ -33,13 +34,18 @@ function SearchHeader() {
   };
 
   const handleSearchPress = () => {
+    dispatch(startLoader());
     sendRequest("post", "products/filter", { products: inputValue })
       .then((res) => {
+        dispatch(stopLoader());
         dispatch(addSearchedProducts(res.filtered));
         dispatch(addSearchSuggestions(null));
         navigation.navigate("Searched Products");
       })
-      .catch((err) => console.log("err", err));
+      .catch((err) => {
+        dispatch(stopLoader());
+        console.log("err", err);
+      });
   };
 
   return (

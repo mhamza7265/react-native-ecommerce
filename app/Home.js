@@ -15,6 +15,7 @@ import sendRequest from "../Utility/apiManager";
 import { addSearchSuggestions } from "../redux/reducers/searchSuggestionsReducer";
 import { addSearchedProducts } from "../redux/reducers/searchedProductsReducer";
 import { useNavigation } from "@react-navigation/native";
+import { startLoader, stopLoader } from "../redux/reducers/activityReducer";
 
 function Home() {
   const dispatch = useDispatch();
@@ -25,13 +26,18 @@ function Home() {
   );
 
   const handleSuggestionPress = (text) => {
+    dispatch(startLoader());
     sendRequest("post", "products/filter", { products: text })
       .then((res) => {
+        dispatch(stopLoader());
         dispatch(addSearchedProducts(res.filtered));
         dispatch(addSearchSuggestions(null));
         navigation.navigate("Searched Products");
       })
-      .catch((err) => console.log("err", err));
+      .catch((err) => {
+        dispatch(stopLoader());
+        console.log("err", err);
+      });
   };
 
   return (
@@ -83,8 +89,10 @@ const style = StyleSheet.create({
     zIndex: 99999,
     width: "76.5%",
     minHeightheight: 50,
+    maxHeight: 210,
     margin: "auto",
     elevation: 5,
+    overflow: "scroll",
   },
 });
 

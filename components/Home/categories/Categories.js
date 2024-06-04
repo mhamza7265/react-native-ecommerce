@@ -1,32 +1,18 @@
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-} from "react-native";
-import Slick from "react-native-slick";
-import Swiper from "react-native-swiper";
+import { View, Text, StyleSheet, Dimensions } from "react-native";
 import { useEffect, useState } from "react";
 import sendRequest from "../../../Utility/apiManager";
-import { useNavigation } from "@react-navigation/native";
-import axios from "axios";
-import BASE_URL from "../../../Utility/config";
 import CategoryCard from "./CategoryCard";
 
 const { width } = Dimensions.get("window");
 
 function Categories() {
   const [categoriesList, setCategoriesList] = useState(null);
-  const navigation = useNavigation();
 
   useEffect(() => {
     sendRequest("get", "category")
       .then((res) => {
         if (res.status) {
           setCategoriesList(res.categories);
-          console.log("cat", res);
         } else {
           console.log("err", res.error);
         }
@@ -43,16 +29,6 @@ function Categories() {
   return (
     <View style={{ paddingTop: 15, flex: 1 }}>
       <Text style={style.text}>CATEGORIES</Text>
-      {/* <Swiper
-        showsButtons={false}
-        autoplay={false}
-        autoplayTimeout={3}
-        loop={true}
-        dotColor="rgba(255, 255, 255, 0.5)"
-        activeDotColor="#fff"
-        paginationStyle={{ bottom: 10 }}
-        style={style.wrapper}
-      > */}
       <View style={style.row}>
         {categoriesList &&
           categoriesList.map((item, i) => (
@@ -64,7 +40,6 @@ function Categories() {
             />
           ))}
       </View>
-      {/* </Swiper> */}
     </View>
   );
 }

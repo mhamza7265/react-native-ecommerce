@@ -1,8 +1,25 @@
 import { View, Image, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from "react-redux";
+import { userLoggedOut } from "../redux/reducers/loginReducer";
 
 function Profile() {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+
+  const handleLogoutPress = async () => {
+    dispatch(userLoggedOut());
+    try {
+      await AsyncStorage.removeItem("currentUser");
+      setTimeout(() => {
+        navigation.navigate("Home");
+      }, 1000);
+    } catch (e) {
+      // remove error
+    }
+  };
 
   return (
     <View style={style.container}>
@@ -17,6 +34,15 @@ function Profile() {
           </Text>
           <Text style={{ textAlign: "right" }}>m.hamza7265@gmail.com</Text>
         </View>
+        <TouchableOpacity style={style.absBox} onPress={handleLogoutPress}>
+          <Text style={style.absBoxText}>Logout</Text>
+          <FontAwesome
+            name="sign-out"
+            size={28}
+            style={style.icon}
+            color={"#fff"}
+          />
+        </TouchableOpacity>
       </View>
       <View style={style.box2}>
         <View style={style.box2ContentBox}>
@@ -104,6 +130,18 @@ const style = StyleSheet.create({
   },
   buttonText: { textAlign: "center", color: "#fff" },
   orderBtn: { backgroundColor: "#FFAF00", padding: 5, borderRadius: 5 },
+  absBox: {
+    flexDirection: "row",
+    position: "absolute",
+    top: 0,
+    right: 0,
+    backgroundColor: "#3BB77E",
+    padding: 5,
+    borderTopRightRadius: 25,
+    borderBottomLeftRadius: 15,
+  },
+  icon: { marginLeft: 5 },
+  absBoxText: { color: "#fff" },
 });
 
 export default Profile;

@@ -47,7 +47,7 @@ function ProductDetails() {
             >
               <FontAwesome
                 name="heart"
-                size={20}
+                size={30}
                 color={addToWishlist ? "#3bb77e" : "gray"}
               />
             </TouchableOpacity>
@@ -106,11 +106,11 @@ const style = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
     alignItems: "center",
-    backgroundColor: "#E7E9F5",
+    backgroundColor: "#FDC040",
   },
   imageContainer: {
     height: width,
-    backgroundColor: "#E7E9F5",
+    backgroundColor: "#3bb77e",
     borderBottomRightRadius: 200,
   },
   wrapper: {
@@ -126,7 +126,7 @@ const style = StyleSheet.create({
     backgroundColor: "#fff",
   },
   box: {
-    backgroundColor: "#E7E9F5",
+    backgroundColor: "#3bb77e",
   },
   innerBox: {
     backgroundColor: "#fff",

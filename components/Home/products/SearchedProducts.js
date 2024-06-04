@@ -7,8 +7,6 @@ function SearchedProducts() {
     (state) => state.searchedProducts.products
   );
 
-  console.log("searched", searchedProducts);
-
   return (
     <View style={{ paddingTop: 15, flex: 1 }}>
       <ScrollView>

@@ -1,9 +1,33 @@
 import { View, Image, TouchableOpacity, StyleSheet, Text } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function Header() {
+  const [loggedIn, setLoggedIn] = useState(false);
   const navigation = useNavigation();
+  const isLoggedIn = useSelector((state) => state.login.isLoggedIn);
+
+  console.log("isLoggedIn", isLoggedIn);
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const value = await AsyncStorage.getItem("currentUser");
+        if (value !== null) {
+          setLoggedIn(true);
+        } else {
+          setLoggedIn(false);
+        }
+      } catch (e) {
+        // error reading value
+      }
+    };
+    getData();
+  }, []);
+
   return (
     <View style={style.row}>
       <Image
@@ -34,15 +58,19 @@ function Header() {
             style={{ color: "#3BB77E" }}
           />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-          <Text style={{ fontSize: 12 }}>Login</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("Profile")}
-          style={{ marginLeft: 5 }}
-        >
-          <Text style={{ fontSize: 12 }}>Profile</Text>
-        </TouchableOpacity>
+        {!isLoggedIn && (
+          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+            <Text style={{ fontSize: 12 }}>Login</Text>
+          </TouchableOpacity>
+        )}
+        {isLoggedIn && (
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Profile")}
+            style={{ marginLeft: 5 }}
+          >
+            <Text style={{ fontSize: 12 }}>Profile</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

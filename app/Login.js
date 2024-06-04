@@ -1,10 +1,37 @@
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  ToastAndroid,
+} from "react-native";
 import { useFonts } from "expo-font";
 import Input from "../components/common/Input";
 import { useForm } from "react-hook-form";
 import InputPassword from "../components/common/InputPassword";
+import sendRequest from "../Utility/apiManager";
+import { useDispatch } from "react-redux";
+import { startLoader, stopLoader } from "../redux/reducers/activityReducer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
+import { userLoggedIn } from "../redux/reducers/loginReducer";
 
 function Login({ navigation }) {
+  const dispatch = useDispatch();
+
+  const showToast = (text) => {
+    ToastAndroid.show(text, ToastAndroid.SHORT);
+  };
+
+  const storeData = async (value) => {
+    try {
+      const jsonValue = JSON.stringify(value);
+      await AsyncStorage.setItem("currentUser", jsonValue);
+    } catch (e) {
+      // saving error
+    }
+  };
+
   const {
     control,
     handleSubmit,
@@ -16,7 +43,30 @@ function Login({ navigation }) {
   });
 
   const onSubmit = (data) => {
-    console.log("loginDetails", data);
+    dispatch(startLoader());
+    sendRequest("post", "login", {
+      ...data,
+      password: data.password,
+      userRole: "basic",
+    })
+      .then((res) => {
+        dispatch(stopLoader());
+        if (res.status) {
+          dispatch(userLoggedIn());
+          showToast(res.login);
+          storeData(res.token);
+          setTimeout(() => {
+            navigation.navigate("Home");
+          }, 2000);
+        } else {
+          showToast(res.error);
+        }
+      })
+      .catch((err) => {
+        dispatch(stopLoader());
+        // showToast(err);
+        console.log("errLogin", err);
+      });
   };
 
   return (

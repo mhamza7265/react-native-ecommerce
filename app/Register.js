@@ -13,6 +13,7 @@ import Input from "../components/common/Input";
 import InputPassword from "../components/common/InputPassword";
 import * as ImagePicker from "expo-image-picker";
 import InputConfirmPassword from "../components/common/InputConfirmPassword";
+import sendRequest from "../Utility/apiManager";
 
 function Register({ navigation }) {
   const [imageUri, setImageUri] = useState(null);
@@ -50,8 +51,45 @@ function Register({ navigation }) {
     }
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     console.log("registerForm", { ...data, image: imageUri });
+    let image = imageUri;
+
+    const imageData = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", image.uri, true);
+      xhr.send(null);
+    });
+
+    const formData = new FormData();
+    formData.append("email", data.email);
+    formData.append("firstName", data.firstName);
+    formData.append("lastName", data.lastName);
+    formData.append("password", data.password);
+    formData.append("role", "basic");
+    formData.append("image", { ...imageData._data, type: "image/jpeg" });
+
+    sendRequest("post", "register", formData, "formData")
+      .then((res) => {
+        console.log("register", res);
+      })
+      .catch((err) => console.log("err", err));
+
+    //   axios
+    //     .post("http://192.168.100.4:3000/register", formData, {
+    //       headers: {
+    //         "Content-Type": "multipart/form-data",
+    //       },
+    //     })
+    //     .then((res) => console.log("res", res))
+    //     .catch((err) => console.log("err", err));
   };
 
   return (
