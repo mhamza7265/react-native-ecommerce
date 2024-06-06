@@ -9,11 +9,28 @@ import {
 } from "react-native";
 
 import { useNavigation } from "@react-navigation/native";
+import { useEffect, useState } from "react";
+import sendRequest from "../../Utility/apiManager";
+import OrderCard from "./OrderCard";
 
 const { width } = Dimensions.get("window");
 
 function Orders() {
   const navigation = useNavigation();
+  const [orders, setOrders] = useState(null);
+
+  useEffect(() => {
+    sendRequest("get", "orders")
+      .then((res) => {
+        if (res.status) {
+          setOrders(res.orders);
+        }
+      })
+      .catch((err) => {
+        console.log("ordersGetErr", err);
+      });
+  }, []);
+
   return (
     <View>
       <ImageBackground
@@ -22,21 +39,16 @@ function Orders() {
       >
         <View style={style.container}>
           <ScrollView>
-            {[...Array(5)].map((_, i) => (
-              <View style={style.orderBox} key={i}>
-                <Text style={{ color: "#fff" }}>{i + 1}</Text>
-                <Text style={{ margin: "auto", color: "#fff" }}>
-                  Lorem Ipsum....
-                </Text>
-                <Text style={{ color: "#fff" }}>5/30/24</Text>
-                <TouchableOpacity
-                  style={style.viewBtn}
-                  onPress={() => navigation.navigate("Order Status")}
-                >
-                  <Text>Status</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
+            {orders &&
+              orders.map((item, i) => (
+                <OrderCard
+                  sr={i + 1}
+                  name={item.name}
+                  date={item.orderDate}
+                  orderId={item.orderId}
+                  id={item._id}
+                />
+              ))}
           </ScrollView>
         </View>
       </ImageBackground>

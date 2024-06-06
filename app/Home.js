@@ -16,6 +16,13 @@ import { addSearchSuggestions } from "../redux/reducers/searchSuggestionsReducer
 import { addSearchedProducts } from "../redux/reducers/searchedProductsReducer";
 import { useNavigation } from "@react-navigation/native";
 import { startLoader, stopLoader } from "../redux/reducers/activityReducer";
+import { useEffect } from "react";
+import { addWishlist } from "../redux/reducers/wishlistReducer";
+import { updateWishlistQuantity } from "../redux/reducers/wishlistQuantityReducer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { userLoggedIn } from "../redux/reducers/loginReducer";
+import { updateCartQuantity } from "../redux/reducers/cartQuantityReducer";
+import { updateCart } from "../redux/reducers/cartReducer";
 
 function Home() {
   const dispatch = useDispatch();
@@ -24,6 +31,53 @@ function Home() {
   const suggestions = useSelector(
     (state) => state.searchSuggestions.suggestions
   );
+
+  useEffect(() => {
+    sendRequest("get", "wishlist").then((res) => {
+      if (res.status) {
+        dispatch(addWishlist(res.wishlist));
+      }
+    });
+    sendRequest("get", "wishlist/qty")
+      .then((res) => {
+        if (res.status) {
+          dispatch(updateWishlistQuantity(res.wishlistQuantity));
+        }
+      })
+      .catch((err) => {
+        console.log("wishlistGetQtyErr", err);
+      });
+
+    sendRequest("get", "cart/qty")
+      .then((res) => {
+        if (res.status) {
+          dispatch(updateCartQuantity(res.quantity));
+        }
+      })
+      .catch((err) => {
+        console.log("cartQtyGetErr", err);
+      });
+
+    sendRequest("get", "cart")
+      .then((res) => {
+        if (res.status) {
+          dispatch(updateCart(res.cart));
+        }
+      })
+      .catch((err) => {
+        console.log("cartGetErr", err);
+      });
+
+    AsyncStorage.getItem("currentUser")
+      .then((res) => {
+        if (res) {
+          dispatch(userLoggedIn());
+        }
+      })
+      .catch((err) => {
+        console.log("tokenFetchError", err);
+      });
+  }, []);
 
   const handleSuggestionPress = (text) => {
     dispatch(startLoader());

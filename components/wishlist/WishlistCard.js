@@ -1,23 +1,54 @@
 import { View, Image, Text, StyleSheet, TouchableOpacity } from "react-native";
 import FontAwesome6Icon from "react-native-vector-icons/FontAwesome6";
 import { useNavigation } from "@react-navigation/native";
+import BASE_URL from "../../Utility/config";
+import sendRequest from "../../Utility/apiManager";
+import { startLoader, stopLoader } from "../../redux/reducers/activityReducer";
+import { useDispatch } from "react-redux";
+import { addProductWithDetail } from "../../redux/reducers/productDetailReducer";
 
-function WishlistCard() {
+function WishlistCard({
+  id,
+  name,
+  price,
+  image,
+  discount,
+  removeFromWishlist,
+}) {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+
+  const handleRemoveFromWishlist = () => {
+    removeFromWishlist(id);
+  };
+
+  const onPressProduct = () => {
+    dispatch(startLoader());
+    sendRequest("get", `product/single/${id}`)
+      .then((res) => {
+        dispatch(stopLoader());
+        if (res.status) {
+          dispatch(addProductWithDetail(res.data[0]));
+          navigation.navigate("Product");
+        }
+      })
+      .catch((err) => {
+        dispatch(stopLoader());
+        console.log("err", err);
+      });
+  };
+
   return (
-    <TouchableOpacity onPress={() => navigation.navigate("Product")}>
+    <TouchableOpacity onPress={onPressProduct}>
       <View style={style.card}>
         <View style={style.trash}>
-          <TouchableOpacity onPress={() => console.log("trig")}>
+          <TouchableOpacity onPress={handleRemoveFromWishlist}>
             <FontAwesome6Icon name="trash" size={16} style={style.trashIcon} />
           </TouchableOpacity>
         </View>
-        <Image
-          source={require("../../assets/images/motorcycle.jpg")}
-          style={style.image}
-        />
+        <Image source={{ uri: BASE_URL + "/" + image }} style={style.image} />
         <View style={{ marginLeft: 10 }}>
-          <Text style={style.text1}>Motorcycle</Text>
+          <Text style={style.text1}>{name}</Text>
           <View
             style={{
               flexDirection: "row",
@@ -27,7 +58,7 @@ function WishlistCard() {
           >
             <FontAwesome6Icon name="dollar-sign" size={16} style={style.icon} />
             <Text style={{ color: "#3bb77e", fontSize: 20 }}>
-              $25{"  "}
+              ${price - (price / 100) * discount}
               <Text
                 style={{
                   textDecorationLine: "line-through",
@@ -35,7 +66,7 @@ function WishlistCard() {
                   color: "gray",
                 }}
               >
-                $50
+                ${price}
               </Text>
             </Text>
           </View>
@@ -57,6 +88,7 @@ const style = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     position: "relative",
+    overflow: "hidden",
   },
   image: {
     objectFit: "contain",
@@ -66,6 +98,7 @@ const style = StyleSheet.create({
   text1: {
     fontWeight: "bold",
     fontSize: 18,
+    width: "100%",
   },
   icon: {
     backgroundColor: "#332858",

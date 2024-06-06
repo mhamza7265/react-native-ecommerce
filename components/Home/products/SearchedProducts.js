@@ -40,7 +40,7 @@ const style = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
-    justifyContent: "space-around",
+    justifyContent: "flex-start",
   },
 });
 

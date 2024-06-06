@@ -1,6 +1,7 @@
 import { View, ScrollView, StyleSheet } from "react-native";
 import { useSelector } from "react-redux";
 import CategoryProductsCard from "./CategoryProductsCard";
+import ProductCard from "../products/ProductCard";
 
 function CategoryProducts() {
   const categoryProducts = useSelector(
@@ -12,7 +13,7 @@ function CategoryProducts() {
       <View style={style.row}>
         {categoryProducts &&
           categoryProducts.map((item, i) => (
-            <CategoryProductsCard
+            <ProductCard
               key={i}
               id={item._id}
               images={item.images}
@@ -31,7 +32,7 @@ const style = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
-    justifyContent: "space-around",
+    justifyContent: "flex-start",
   },
 });
 

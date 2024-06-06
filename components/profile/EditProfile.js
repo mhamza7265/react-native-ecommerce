@@ -12,9 +12,12 @@ import { useForm } from "react-hook-form";
 import Input from "../common/Input";
 import * as ImagePicker from "expo-image-picker";
 import { useState, useEffect } from "react";
+import sendRequest from "../../Utility/apiManager";
+import BASE_URL from "../../Utility/config";
 
 function EditProfile() {
   const [imageUri, setImageUri] = useState(null);
+  const [profile, setProfile] = useState(null);
   const {
     control,
     handleSubmit,
@@ -31,6 +34,16 @@ function EditProfile() {
         }
       }
     })();
+
+    sendRequest("get", "user")
+      .then((res) => {
+        if (res.status) {
+          setProfile(res.user);
+        }
+      })
+      .catch((err) => {
+        console.log("profileGetError", err);
+      });
   }, []);
 
   const onSubmit = (data) => {
@@ -58,7 +71,7 @@ function EditProfile() {
             source={
               imageUri
                 ? { uri: imageUri.uri }
-                : require("../../assets/images/me.jpg")
+                : { uri: BASE_URL + "/" + profile?.image }
             }
             style={style.image}
           />
@@ -68,9 +81,11 @@ function EditProfile() {
         </View>
         <View style={{ textAlign: "right" }}>
           <Text style={[style.box1Text1, { textAlign: "right" }]}>
-            Muhammad Hamza
+            {profile?.first_name + " " + profile?.last_name}
           </Text>
-          <Text style={{ textAlign: "right" }}>m.hamza7265@gmail.com</Text>
+          <Text style={{ textAlign: "right", fontSize: 13 }}>
+            {profile?.email}
+          </Text>
         </View>
       </View>
       <View style={style.box2}>
@@ -113,7 +128,7 @@ function EditProfile() {
           />
         </View>
 
-        <View style={style.box2ContentBox}>
+        {/* <View style={style.box2ContentBox}>
           <Text style={{ fontSize: 16, marginBottom: 10 }}>Phone</Text>
           <Input
             placeholder="Phone"
@@ -124,9 +139,9 @@ function EditProfile() {
             control={control}
             required={false}
           />
-        </View>
+        </View> */}
 
-        <View style={style.box2ContentBox}>
+        {/* <View style={style.box2ContentBox}>
           <Text style={{ fontSize: 16 }}>Address</Text>
           <Input
             placeholder="Address"
@@ -137,7 +152,7 @@ function EditProfile() {
             control={control}
             required={false}
           />
-        </View>
+        </View> */}
 
         <TouchableOpacity style={style.button} onPress={handleSubmit(onSubmit)}>
           <Text style={style.buttonText}>Edit Profile</Text>

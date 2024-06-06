@@ -76,11 +76,44 @@ function Register({ navigation }) {
     formData.append("role", "basic");
     formData.append("image", { ...imageData._data, type: "image/jpeg" });
 
-    sendRequest("post", "register", formData, "formData")
-      .then((res) => {
-        console.log("register", res);
-      })
-      .catch((err) => console.log("err", err));
+    // ReactNativeBlobUtil.fetch(
+    //   "POST",
+    //   "http://192.168.100.4:3000/register",
+    //   {
+    //     Authorization: "",
+    //     "Content-Type": "multipart/form-data",
+    //   },
+    //   [
+    //     // element with property `filename` will be transformed into `file` in form data
+    //     { name: "image", filename: "photo.png", data: binaryDataInBase64 },
+    //     // custom content type
+    //     {
+    //       name: "image",
+    //       filename: "photo-png.png",
+    //       type: "image/png",
+    //       data: binaryDataInBase64,
+    //     },
+    //     // part file from storage
+    //     {
+    //       name: "image",
+    //       filename: "photo.png",
+    //       type: "image/jpg",
+    //       data: ReactNativeBlobUtil.wrap(imageUri.uri),
+    //     },
+    //     // elements without property `filename` will be sent as plain text
+    //     { name: "email", data: data.email },
+    //     { name: "firstName", data: data.firstName },
+    //     { name: "lastName", data: data.lastName },
+    //     { name: "password", data: data.password },
+    //     { name: "role", data: data.role },
+    //   ]
+    // )
+    //   .then((resp) => {
+    //     console.log("response", resp);
+    //   })
+    //   .catch((err) => {
+    //     console.log("error", err);
+    //   });
 
     //   axios
     //     .post("http://192.168.100.4:3000/register", formData, {

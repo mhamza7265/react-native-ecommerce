@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   View,
   ScrollView,
@@ -7,15 +8,33 @@ import {
   Dimensions,
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import sendRequest from "../../Utility/apiManager";
+import { useSelector } from "react-redux";
 
 const { width } = Dimensions.get("window");
 
 function OrderStatus() {
-  const orderStatus = [
-    { icon: "shopping-basket", date: "5/30/24", title: "Order Placed" },
-    { icon: "cube", date: "5/31/24", title: "Product Packaging" },
-    { icon: "ship", date: "6/1/24", title: "Ready to Ship" },
-  ];
+  const [orderStatus, setOrderStatus] = useState(null);
+  const orderNumber = useSelector((state) => state.orderNumber.orderNumber);
+  // const orderStatus = [
+  //   { icon: "shopping-basket", date: "5/30/24", title: "Order Placed" },
+  //   { icon: "cube", date: "5/31/24", title: "Product Packaging" },
+  //   { icon: "ship", date: "6/1/24", title: "Ready to Ship" },
+  // ];
+
+  console.log("orderNum", orderNumber);
+  useEffect(() => {
+    sendRequest("get", `order/status/${orderNumber}`)
+      .then((res) => {
+        if (res.status) {
+          setOrderStatus(res.orderStatus);
+        }
+      })
+      .catch((err) => {
+        console.log("orderStatusGetErr", err);
+      });
+  }, []);
+
   return (
     <View>
       <ImageBackground
@@ -24,16 +43,14 @@ function OrderStatus() {
       >
         <View style={style.container}>
           <ScrollView>
-            {orderStatus.map((item, i) => (
-              <View style={style.orderBox} key={i}>
-                <FontAwesome name={item.icon} size={16} style={style.icon} />
-                <View style={style.box1}>
-                  <Text style={style.text1}>{item.title}</Text>
-                  <Text>{item.date}</Text>
-                </View>
-                <FontAwesome name="check" size={16} style={style.checkIcon} />
+            <View style={style.orderBox}>
+              <FontAwesome name={"cube"} size={16} style={style.icon} />
+              <View style={style.box1}>
+                <Text style={style.text1}>{orderStatus}</Text>
+                {/* <Text>{item.date}</Text> */}
               </View>
-            ))}
+              <FontAwesome name="check" size={16} style={style.checkIcon} />
+            </View>
           </ScrollView>
         </View>
       </ImageBackground>
@@ -44,7 +61,7 @@ function OrderStatus() {
 const style = StyleSheet.create({
   container: {
     width: width / 1.05,
-    minHeight: width / 2,
+    minHeight: width / 3,
     maxHeight: width * 1.5,
     padding: 30,
     paddingTop: 40,

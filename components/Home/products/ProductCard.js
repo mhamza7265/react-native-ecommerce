@@ -5,24 +5,36 @@ import {
   Image,
   Dimensions,
   TouchableOpacity,
+  ToastAndroid,
   TouchableWithoutFeedback,
 } from "react-native";
 import BASE_URL from "../../../Utility/config";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import sendRequest from "../../../Utility/apiManager";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addProductWithDetail } from "../../../redux/reducers/productDetailReducer";
 import { useNavigation } from "@react-navigation/native";
 import {
   startLoader,
   stopLoader,
 } from "../../../redux/reducers/activityReducer";
+import { updateWishlistQuantity } from "../../../redux/reducers/wishlistQuantityReducer";
+import { addWishlist } from "../../../redux/reducers/wishlistReducer";
+import { updateCart } from "../../../redux/reducers/cartReducer";
+import { updateCartQuantity } from "../../../redux/reducers/cartQuantityReducer";
 
 const { width } = Dimensions.get("window");
 
 function ProductCard({ id, images, name, price, discountValue }) {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const wishlistList = useSelector((state) => state.wishlist.wishlist);
+
+  const filtered = wishlistList?.find((item) => item.productId == id);
+
+  const showToast = (text) => {
+    ToastAndroid.show(text, ToastAndroid.SHORT);
+  };
 
   const onPressProduct = () => {
     dispatch(startLoader());
@@ -39,6 +51,70 @@ function ProductCard({ id, images, name, price, discountValue }) {
         console.log("err", err);
       });
   };
+
+  const handleWishlistPress = () => {
+    sendRequest("post", "wishlist", { prodId: id })
+      .then((res) => {
+        if (res.status) {
+          showToast(res.message);
+          sendRequest("get", "wishlist")
+            .then((res) => {
+              if (res.status) {
+                console.log("wishlist", res.wishlist);
+                dispatch(addWishlist(res.wishlist));
+              }
+            })
+            .catch((err) => {
+              console.log("wishlistGetError", err);
+            });
+
+          sendRequest("get", "wishlist/qty")
+            .then((res) => {
+              if (res.status) {
+                dispatch(updateWishlistQuantity(res.wishlistQuantity));
+              }
+            })
+            .catch((err) => {
+              console.log("wishlistQuantityError", err);
+            });
+        } else {
+          showToast(res.error);
+        }
+      })
+      .catch((err) => {
+        console.log("wishlistPostError", err);
+      });
+  };
+
+  const handleCartPress = () => {
+    dispatch(startLoader());
+    sendRequest("post", "cart", { id, quantity: 1 })
+      .then((res) => {
+        dispatch(stopLoader());
+        if (res.status) {
+          dispatch(updateCart(res.cart));
+          showToast(res.message);
+          sendRequest("get", "cart/qty")
+            .then((res) => {
+              console.log("qty", res);
+              dispatch(updateCartQuantity(res.quantity));
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        } else {
+          showToast(res.error);
+          if (res.type == "updatePassword") {
+          } else if (res.type == "loginToContinue") {
+          }
+        }
+      })
+      .catch((err) => {
+        dispatch(stopLoader());
+        showToast(err);
+      });
+  };
+
   return (
     <TouchableWithoutFeedback onPress={onPressProduct}>
       <View style={style.card}>
@@ -60,15 +136,22 @@ function ProductCard({ id, images, name, price, discountValue }) {
           </Text>
         </Text>
         <View style={style.row}>
-          <TouchableOpacity style={style.button}>
+          <TouchableOpacity style={style.button} onPress={handleCartPress}>
             <FontAwesome
               name="shopping-cart"
               size={20}
               style={{ color: "#fff" }}
             />
           </TouchableOpacity>
-          <TouchableOpacity style={style.buttonTwo}>
-            <FontAwesome name="heart" size={18} style={{ color: "#000" }} />
+          <TouchableOpacity
+            style={style.buttonTwo}
+            onPress={handleWishlistPress}
+          >
+            <FontAwesome
+              name="heart"
+              size={18}
+              style={{ color: filtered ? "#FDC040" : "#000" }}
+            />
           </TouchableOpacity>
         </View>
       </View>

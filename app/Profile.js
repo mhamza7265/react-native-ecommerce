@@ -4,10 +4,26 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch } from "react-redux";
 import { userLoggedOut } from "../redux/reducers/loginReducer";
+import { useEffect, useState } from "react";
+import sendRequest from "../Utility/apiManager";
+import BASE_URL from "../Utility/config";
 
 function Profile() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    sendRequest("get", "user")
+      .then((res) => {
+        if (res.status) {
+          setProfile(res.user);
+        }
+      })
+      .catch((err) => {
+        console.log("profileGetErr", err);
+      });
+  }, []);
 
   const handleLogoutPress = async () => {
     dispatch(userLoggedOut());
@@ -25,14 +41,16 @@ function Profile() {
     <View style={style.container}>
       <View style={style.box1}>
         <Image
-          source={require("../assets/images/me.jpg")}
+          source={{ uri: BASE_URL + "/" + profile?.image }}
           style={style.image}
         />
         <View>
           <Text style={[style.box1Text1, { textAlign: "right" }]}>
-            Muhammad Hamza
+            {profile?.first_name + " " + profile?.last_name}
           </Text>
-          <Text style={{ textAlign: "right" }}>m.hamza7265@gmail.com</Text>
+          <Text style={{ textAlign: "right", fontSize: 13 }}>
+            {profile?.email}
+          </Text>
         </View>
         <TouchableOpacity style={style.absBox} onPress={handleLogoutPress}>
           <Text style={style.absBoxText}>Logout</Text>
@@ -47,23 +65,25 @@ function Profile() {
       <View style={style.box2}>
         <View style={style.box2ContentBox}>
           <Text style={{ fontSize: 16 }}>Email</Text>
-          <Text style={{ color: "gray" }}>m.hamza7265@gmail.com</Text>
+          <Text style={{ color: "gray", fontSize: 13 }}>{profile?.email}</Text>
         </View>
 
         <View style={style.box2ContentBox}>
           <Text style={{ fontSize: 16 }}>Full Name</Text>
-          <Text style={{ color: "gray" }}>Muhammad Hamza</Text>
+          <Text style={{ color: "gray" }}>
+            {profile?.first_name + " " + profile?.last_name}
+          </Text>
         </View>
 
-        <View style={style.box2ContentBox}>
+        {/* <View style={style.box2ContentBox}>
           <Text style={{ fontSize: 16 }}>Phone</Text>
           <Text style={{ color: "gray" }}>03424259468</Text>
-        </View>
+        </View> */}
 
-        <View style={style.box2ContentBox}>
+        {/* <View style={style.box2ContentBox}>
           <Text style={{ fontSize: 16 }}>Address</Text>
           <Text style={{ color: "gray" }}>Lorem Ipsum</Text>
-        </View>
+        </View> */}
 
         <View style={style.box2ContentBox}>
           <Text style={{ fontSize: 16 }}>My Orders</Text>

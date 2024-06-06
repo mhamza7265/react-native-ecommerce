@@ -9,6 +9,12 @@ function Header() {
   const [loggedIn, setLoggedIn] = useState(false);
   const navigation = useNavigation();
   const isLoggedIn = useSelector((state) => state.login.isLoggedIn);
+  const wishlistQty = useSelector(
+    (state) => state.wishlistQuantity.wishlistQuantity
+  );
+  const cartQty = useSelector((state) => state.cartQuantity.cartQuantity);
+
+  console.log("cartQty", cartQty);
 
   console.log("isLoggedIn", isLoggedIn);
 
@@ -43,13 +49,16 @@ function Header() {
         style={{ flexDirection: "row", marginTop: 5, alignItems: "center" }}
       >
         <TouchableOpacity
-          style={{ marginRight: 10 }}
+          style={{ marginRight: 10, position: "relative" }}
           onPress={() => navigation.navigate("Wishlist")}
         >
           <FontAwesome name="heart" size={22} style={{ color: "#3BB77E" }} />
+          <View style={style.absQty}>
+            <Text style={style.absText}>{wishlistQty}</Text>
+          </View>
         </TouchableOpacity>
         <TouchableOpacity
-          style={{ marginRight: 10 }}
+          style={{ marginRight: 10, position: "relative" }}
           onPress={() => navigation.navigate("Cart")}
         >
           <FontAwesome
@@ -57,6 +66,9 @@ function Header() {
             size={24}
             style={{ color: "#3BB77E" }}
           />
+          <View style={style.absQty}>
+            <Text style={style.absText}>{cartQty}</Text>
+          </View>
         </TouchableOpacity>
         {!isLoggedIn && (
           <TouchableOpacity onPress={() => navigation.navigate("Login")}>
@@ -89,6 +101,14 @@ const style = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
+  absQty: {
+    position: "absolute",
+    right: 0,
+    backgroundColor: "#FDC040",
+    width: 13,
+    borderRadius: 8,
+  },
+  absText: { fontSize: 7, fontWeight: "bold", textAlign: "center" },
 });
 
 export default Header;

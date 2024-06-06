@@ -1,68 +1,93 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  ScrollView,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
+import { useForm } from "react-hook-form";
+import Input from "../common/Input";
+import { useEffect, useState } from "react";
+import sendRequest from "../../Utility/apiManager";
+import { useDispatch } from "react-redux";
+import { updateBillingAddress } from "../../redux/reducers/billingAddressReducer";
 
 function Billing() {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const [cart, setCart] = useState(null);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  useEffect(() => {
+    sendRequest("get", "cart")
+      .then((res) => {
+        if (res.status) {
+          setCart(res.cart[0]);
+        }
+      })
+      .catch((err) => {
+        console.log("cartGetErr", err);
+      });
+  }, []);
+
+  const handlePaymentMethodPress = (data) => {
+    dispatch(updateBillingAddress(data));
+    navigation.navigate("Payment Method");
+  };
+
   return (
-    <View>
+    <ScrollView>
       <View style={style.box}>
         <View style={style.box1}>
           <Text style={style.title}>Billing Information</Text>
         </View>
         <View style={{ padding: 20 }}>
-          <View style={style.row}>
-            <View style={style.row1}>
-              <FontAwesome name="user" size={18} style={style.icon} />
-              <Text style={style.text1}>Full Name</Text>
-            </View>
-            <Text>Muhammad Hamza</Text>
-          </View>
+          <Input
+            placeholder="Address"
+            name="address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            errors={errors}
+            control={control}
+            required={true}
+          />
 
-          <View style={style.row}>
-            <View style={style.row1}>
-              <FontAwesome
-                name="envelope"
-                size={14}
-                style={[style.icon, { paddingTop: 12, paddingBottom: 12 }]}
-              />
-              <Text style={style.text1}>Email</Text>
-            </View>
-            <Text>m.hamza@gmail.com</Text>
-          </View>
+          <Input
+            placeholder="City"
+            name="city"
+            autoCapitalize="none"
+            autoCorrect={false}
+            errors={errors}
+            control={control}
+            required={true}
+          />
 
-          <View style={style.row}>
-            <View style={style.row1}>
-              <FontAwesome
-                name="phone"
-                size={18}
-                style={[style.icon, { paddingTop: 11, paddingBottom: 11 }]}
-              />
-              <Text style={style.text1}>Phone</Text>
-            </View>
-            <Text>+923424259468</Text>
-          </View>
+          <Input
+            placeholder="State"
+            name="state"
+            autoCapitalize="none"
+            autoCorrect={false}
+            errors={errors}
+            control={control}
+            required={true}
+          />
 
-          <View style={style.row}>
-            <View style={style.row1}>
-              <FontAwesome
-                name="address-card"
-                size={14}
-                style={[style.icon, { paddingTop: 14, paddingBottom: 14 }]}
-              />
-              <Text style={style.text1}>Address</Text>
-            </View>
-            <Text>Lorem Ipsum...</Text>
-          </View>
-
-          <TouchableOpacity
-            style={style.button1}
-            onPress={() => navigation.navigate("Edit Profile")}
-          >
-            <Text style={{ textAlign: "center", color: "#fff" }}>
-              Edit Billing Information
-            </Text>
-          </TouchableOpacity>
+          <Input
+            placeholder="Country"
+            name="country"
+            autoCapitalize="none"
+            autoCorrect={false}
+            errors={errors}
+            control={control}
+            required={true}
+          />
         </View>
       </View>
       <View
@@ -76,15 +101,17 @@ function Billing() {
           },
         ]}
       >
-        <Text style={{ fontWeight: "bold", fontSize: 20 }}>$38.84</Text>
+        <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+          ${cart?.grandTotal}
+        </Text>
         <TouchableOpacity
           style={style.button2}
-          onPress={() => navigation.navigate("Payment Method")}
+          onPress={handleSubmit(handlePaymentMethodPress)}
         >
           <Text style={{ color: "#fff" }}>Confirm & Pay</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 

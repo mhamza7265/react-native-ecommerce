@@ -7,34 +7,77 @@ import {
 } from "react-native";
 import CartRow from "./CartRow";
 import { useNavigation } from "@react-navigation/native";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import sendRequest from "../../Utility/apiManager";
+import { updateCart } from "../../redux/reducers/cartReducer";
 
 function Cart() {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  // const cart = useSelector((state) => state.cart.cart);
+  const [cart, setCart] = useState(null);
+
+  useEffect(() => {
+    sendRequest("get", "cart")
+      .then((res) => {
+        if (res.status) {
+          dispatch(updateCart(res.cart[0].cartItems[0]));
+          setCart(res.cart[0]);
+        }
+      })
+      .catch((err) => {
+        console.log("cartGetErr", err);
+      });
+  }, []);
+
+  console.log("cart", cart);
+
   return (
-    <ScrollView contentContainerStyle={{ height: "100%" }}>
+    <ScrollView>
       <View style={style.box1}>
-        {[...Array(5)].map((_, i) => (
-          <CartRow key={i} />
-        ))}
+        {cart && Object.keys(cart.cartItems[0]).length > 0 ? (
+          Object.values(cart.cartItems[0]).map((item, i) => (
+            <CartRow
+              key={i}
+              prodId={item.productId}
+              name={item.name}
+              description={item.description}
+              price={item.price}
+              image={item.images[0]}
+              discount={item.discount.discountValue}
+              quantity={item.quantity}
+              calculations={item.calculations}
+              setCart={setCart}
+            />
+          ))
+        ) : (
+          <Text style={{ textAlign: "center" }}>Cart is empty</Text>
+        )}
       </View>
-      <View
-        style={[
-          style.box1,
-          {
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          },
-        ]}
-      >
-        <Text style={{ fontWeight: "bold", fontSize: 20 }}>$38.84</Text>
-        <TouchableOpacity
-          style={style.button}
-          onPress={() => navigation.navigate("Billing")}
+
+      {cart && Object.keys(cart.cartItems[0]).length > 0 && (
+        <View
+          style={[
+            style.box1,
+            {
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            },
+          ]}
         >
-          <Text style={{ color: "#fff" }}>Checkout</Text>
-        </TouchableOpacity>
-      </View>
+          <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+            ${cart?.grandTotal}
+          </Text>
+          <TouchableOpacity
+            style={style.button}
+            onPress={() => navigation.navigate("Billing")}
+          >
+            <Text style={{ color: "#fff" }}>Checkout</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </ScrollView>
   );
 }
