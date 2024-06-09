@@ -6,6 +6,7 @@ import {
   Text,
   StyleSheet,
   Platform,
+  ToastAndroid,
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { useForm } from "react-hook-form";
@@ -14,15 +15,26 @@ import * as ImagePicker from "expo-image-picker";
 import { useState, useEffect } from "react";
 import sendRequest from "../../Utility/apiManager";
 import BASE_URL from "../../Utility/config";
+import { useDispatch, useSelector } from "react-redux";
+import { startLoader, stopLoader } from "../../redux/reducers/activityReducer";
+import { useNavigation } from "@react-navigation/native";
+import { addCurrentUser } from "../../redux/reducers/currentUserReducer";
 
 function EditProfile() {
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
   const [imageUri, setImageUri] = useState(null);
   const [profile, setProfile] = useState(null);
+  const user = useSelector((state) => state.currentUser.user);
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  const showToast = (text) => {
+    ToastAndroid.show(text, ToastAndroid.SHORT);
+  };
 
   useEffect(() => {
     (async () => {
@@ -39,6 +51,7 @@ function EditProfile() {
       .then((res) => {
         if (res.status) {
           setProfile(res.user);
+          dispatch(addCurrentUser(res.user));
         }
       })
       .catch((err) => {
@@ -47,8 +60,41 @@ function EditProfile() {
   }, []);
 
   const onSubmit = (data) => {
-    const d = { ...data, image: imageUri };
-    console.log("data", d);
+    const formData = new FormData();
+    data.firstName && formData.append("first_name", data.firstName);
+    data.lastName && formData.append("last_name", data.lastName);
+    imageUri &&
+      formData.append("file", {
+        uri: imageUri?.uri,
+        type: "image/jpeg",
+        name: "photo.jpg",
+        fileName: "photo.jpg",
+      });
+    dispatch(startLoader());
+    sendRequest("put", "user", formData, "formData")
+      .then((res) => {
+        dispatch(stopLoader());
+        if (res.status) {
+          showToast(res.message);
+          sendRequest("get", "user")
+            .then((res) => {
+              if (res.status) {
+                setProfile(res.user);
+                dispatch(addCurrentUser(res.user));
+              }
+            })
+            .catch((err) => {
+              console.log("profileGetError", err);
+            });
+          setTimeout(() => {
+            navigation.navigate("Profile");
+          }, 1000);
+        }
+      })
+      .catch((err) => {
+        dispatch(stopLoader());
+        console.log("err", err);
+      });
   };
 
   const handleImageSelect = async () => {
@@ -71,7 +117,7 @@ function EditProfile() {
             source={
               imageUri
                 ? { uri: imageUri.uri }
-                : { uri: BASE_URL + "/" + profile?.image }
+                : { uri: BASE_URL + "/" + user?.image }
             }
             style={style.image}
           />
@@ -81,15 +127,15 @@ function EditProfile() {
         </View>
         <View style={{ textAlign: "right" }}>
           <Text style={[style.box1Text1, { textAlign: "right" }]}>
-            {profile?.first_name + " " + profile?.last_name}
+            {user?.first_name + " " + user?.last_name}
           </Text>
           <Text style={{ textAlign: "right", fontSize: 13 }}>
-            {profile?.email}
+            {user?.email}
           </Text>
         </View>
       </View>
       <View style={style.box2}>
-        <View style={style.box2ContentBox}>
+        {/* <View style={style.box2ContentBox}>
           <Text style={{ fontSize: 16, marginBottom: 10 }}>Email</Text>
           <Input
             placeholder="Email"
@@ -100,7 +146,7 @@ function EditProfile() {
             control={control}
             required={false}
           />
-        </View>
+        </View> */}
 
         <View style={style.box2ContentBox}>
           <Text style={{ fontSize: 16, marginBottom: 10 }}>First Name</Text>

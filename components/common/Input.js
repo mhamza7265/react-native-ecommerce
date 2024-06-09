@@ -9,6 +9,7 @@ function Input({
   errors,
   control,
   required,
+  defaultValue,
 }) {
   return (
     <View style={{ marginBottom: 30 }}>
@@ -25,6 +26,7 @@ function Input({
             value={value}
             onBlur={onBlur}
             onChangeText={onChange}
+            defaultValue={defaultValue}
           />
         )}
       />

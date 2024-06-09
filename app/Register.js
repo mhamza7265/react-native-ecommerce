@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ScrollView,
   Platform,
+  ToastAndroid,
 } from "react-native";
 import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
@@ -14,9 +15,12 @@ import InputPassword from "../components/common/InputPassword";
 import * as ImagePicker from "expo-image-picker";
 import InputConfirmPassword from "../components/common/InputConfirmPassword";
 import sendRequest from "../Utility/apiManager";
+import { useDispatch } from "react-redux";
+import { startLoader, stopLoader } from "../redux/reducers/activityReducer";
 
 function Register({ navigation }) {
   const [imageUri, setImageUri] = useState(null);
+  const dispatch = useDispatch();
 
   const {
     control,
@@ -26,6 +30,10 @@ function Register({ navigation }) {
   } = useForm();
 
   const confirm = watch("password");
+
+  const showToast = (text) => {
+    ToastAndroid.show(text, ToastAndroid.SHORT);
+  };
 
   useEffect(() => {
     (async () => {
@@ -52,77 +60,37 @@ function Register({ navigation }) {
   };
 
   const onSubmit = async (data) => {
-    console.log("registerForm", { ...data, image: imageUri });
-    let image = imageUri;
-
-    const imageData = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.onload = function () {
-        resolve(xhr.response);
-      };
-      xhr.onerror = function (e) {
-        reject(new TypeError("Network request failed"));
-      };
-      xhr.responseType = "blob";
-      xhr.open("GET", image.uri, true);
-      xhr.send(null);
-    });
-
     const formData = new FormData();
     formData.append("email", data.email);
     formData.append("firstName", data.firstName);
     formData.append("lastName", data.lastName);
     formData.append("password", data.password);
     formData.append("role", "basic");
-    formData.append("image", { ...imageData._data, type: "image/jpeg" });
-
-    // ReactNativeBlobUtil.fetch(
-    //   "POST",
-    //   "http://192.168.100.4:3000/register",
-    //   {
-    //     Authorization: "",
-    //     "Content-Type": "multipart/form-data",
-    //   },
-    //   [
-    //     // element with property `filename` will be transformed into `file` in form data
-    //     { name: "image", filename: "photo.png", data: binaryDataInBase64 },
-    //     // custom content type
-    //     {
-    //       name: "image",
-    //       filename: "photo-png.png",
-    //       type: "image/png",
-    //       data: binaryDataInBase64,
-    //     },
-    //     // part file from storage
-    //     {
-    //       name: "image",
-    //       filename: "photo.png",
-    //       type: "image/jpg",
-    //       data: ReactNativeBlobUtil.wrap(imageUri.uri),
-    //     },
-    //     // elements without property `filename` will be sent as plain text
-    //     { name: "email", data: data.email },
-    //     { name: "firstName", data: data.firstName },
-    //     { name: "lastName", data: data.lastName },
-    //     { name: "password", data: data.password },
-    //     { name: "role", data: data.role },
-    //   ]
-    // )
-    //   .then((resp) => {
-    //     console.log("response", resp);
-    //   })
-    //   .catch((err) => {
-    //     console.log("error", err);
-    //   });
-
-    //   axios
-    //     .post("http://192.168.100.4:3000/register", formData, {
-    //       headers: {
-    //         "Content-Type": "multipart/form-data",
-    //       },
-    //     })
-    //     .then((res) => console.log("res", res))
-    //     .catch((err) => console.log("err", err));
+    formData.append("image", {
+      uri: imageUri.uri,
+      type: "image/jpeg",
+      name: "photo.jpeg",
+      fileName: "photo.jpeg",
+    });
+    dispatch(startLoader());
+    sendRequest("post", "register", formData, "formData")
+      .then((res) => {
+        dispatch(stopLoader());
+        console.log("res", res);
+        if (res.status) {
+          showToast(res.message);
+          setTimeout(() => {
+            navigation.navigate("Login");
+          }, 1000);
+        } else {
+          // showToast(res.error);
+        }
+      })
+      .catch((err) => {
+        dispatch(stopLoader());
+        console.log("err", err);
+        showToast(err);
+      });
   };
 
   return (

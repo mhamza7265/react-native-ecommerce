@@ -2,22 +2,27 @@ import { View, Image, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { userLoggedOut } from "../redux/reducers/loginReducer";
 import { useEffect, useState } from "react";
 import sendRequest from "../Utility/apiManager";
 import BASE_URL from "../Utility/config";
+import { addWishlist } from "../redux/reducers/wishlistReducer";
+import { updateWishlistQuantity } from "../redux/reducers/wishlistQuantityReducer";
+import { addCurrentUser } from "../redux/reducers/currentUserReducer";
 
 function Profile() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [profile, setProfile] = useState(null);
+  const user = useSelector((state) => state.currentUser.user);
 
   useEffect(() => {
     sendRequest("get", "user")
       .then((res) => {
         if (res.status) {
           setProfile(res.user);
+          dispatch(addCurrentUser(res.user));
         }
       })
       .catch((err) => {
@@ -29,6 +34,7 @@ function Profile() {
     dispatch(userLoggedOut());
     try {
       await AsyncStorage.removeItem("currentUser");
+      dispatch(addWishlist(null));
       setTimeout(() => {
         navigation.navigate("Home");
       }, 1000);
@@ -41,15 +47,15 @@ function Profile() {
     <View style={style.container}>
       <View style={style.box1}>
         <Image
-          source={{ uri: BASE_URL + "/" + profile?.image }}
+          source={{ uri: BASE_URL + "/" + user?.image }}
           style={style.image}
         />
         <View>
           <Text style={[style.box1Text1, { textAlign: "right" }]}>
-            {profile?.first_name + " " + profile?.last_name}
+            {user?.first_name + " " + user?.last_name}
           </Text>
           <Text style={{ textAlign: "right", fontSize: 13 }}>
-            {profile?.email}
+            {user?.email}
           </Text>
         </View>
         <TouchableOpacity style={style.absBox} onPress={handleLogoutPress}>

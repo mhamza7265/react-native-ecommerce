@@ -62,7 +62,7 @@ function Wishlist() {
 
   return (
     <ScrollView>
-      {wishlist ? (
+      {wishlist && wishlist.length > 0 ? (
         wishlist.map((item, i) => (
           <WishlistCard
             key={i}

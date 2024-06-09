@@ -19,6 +19,7 @@ import CategoryProducts from "./components/Home/categories/CategoryProducts";
 import SearchedProducts from "./components/Home/products/SearchedProducts";
 import { useSelector } from "react-redux";
 import { ToastAndroid } from "react-native";
+import Verify from "./app/Verify";
 
 const Stack = createNativeStackNavigator();
 
@@ -44,6 +45,7 @@ function Main() {
           <Stack.Screen name="Wishlist" component={Wishlist} />
           <Stack.Screen name="Products" component={CategoryProducts} />
           <Stack.Screen name="Searched Products" component={SearchedProducts} />
+          <Stack.Screen name="Verify" component={Verify} />
         </Stack.Navigator>
       </NavigationContainer>
       {loaderIsActive && (

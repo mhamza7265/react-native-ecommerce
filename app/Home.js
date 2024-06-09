@@ -3,6 +3,7 @@ import {
   StyleSheet,
   ScrollView,
   Text,
+  Dimensions,
   TouchableWithoutFeedback,
 } from "react-native";
 import Header from "../components/Home/Header";
@@ -16,17 +17,19 @@ import { addSearchSuggestions } from "../redux/reducers/searchSuggestionsReducer
 import { addSearchedProducts } from "../redux/reducers/searchedProductsReducer";
 import { useNavigation } from "@react-navigation/native";
 import { startLoader, stopLoader } from "../redux/reducers/activityReducer";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { addWishlist } from "../redux/reducers/wishlistReducer";
 import { updateWishlistQuantity } from "../redux/reducers/wishlistQuantityReducer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { userLoggedIn } from "../redux/reducers/loginReducer";
 import { updateCartQuantity } from "../redux/reducers/cartQuantityReducer";
 import { updateCart } from "../redux/reducers/cartReducer";
+const { height } = Dimensions.get("window");
 
 function Home() {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const scrollRef = useRef();
 
   const suggestions = useSelector(
     (state) => state.searchSuggestions.suggestions
@@ -94,10 +97,21 @@ function Home() {
       });
   };
 
+  const handleScroll = (e) => {
+    // const scroll = e.nativeEvent.contentOffset.y + 620;
+    // console.log("scrollTop", scroll);
+    // const scrollHeight = e.nativeEvent.contentSize.height;
+    // console.log("scrollHeight", scrollHeight);
+  };
+
   return (
     <View style={style.container}>
       <Header />
-      <ScrollView contentContainerStyle={{ justifyContent: "center" }}>
+      <ScrollView
+        contentContainerStyle={{ justifyContent: "center" }}
+        onScroll={handleScroll}
+        ref={scrollRef}
+      >
         <SearchHeader />
         {suggestions && (
           <View style={style.absoluteBox}>

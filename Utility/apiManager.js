@@ -7,10 +7,10 @@ const openApis = ["auth/login", "auth/register"];
 const sendRequest = async (method, url, payload, contentType, userType) => {
   const token = await getMyObject();
 
-  console.log(
-    "url",
-    setRequestOptions(method, url, payload, contentType, userType, token)
-  );
+  // console.log(
+  //   "url",
+  //   setRequestOptions(method, url, payload, contentType, userType, token)
+  // );
 
   return new Promise((resolve, reject) => {
     axios

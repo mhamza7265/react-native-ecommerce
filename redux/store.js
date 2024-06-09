@@ -13,6 +13,8 @@ import cartReducer from "./reducers/cartReducer";
 import billingAddressReducer from "./reducers/billingAddressReducer";
 import orderReducer from "./reducers/orderReducer";
 import orderNumberReducer from "./reducers/orderNumberReducer";
+import logInUserReducer from "./reducers/loggingInReducer";
+import currentUserReducer from "./reducers/currentUserReducer";
 
 const rootReducer = combineReducers({
   categoryProducts: categoryProductsReducer,
@@ -28,6 +30,8 @@ const rootReducer = combineReducers({
   billing: billingAddressReducer,
   orders: orderReducer,
   orderNumber: orderNumberReducer,
+  loginUser: logInUserReducer,
+  currentUser: currentUserReducer,
 });
 
 const store = createStore(rootReducer, composeWithDevTools());

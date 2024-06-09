@@ -15,6 +15,7 @@ import { startLoader, stopLoader } from "../redux/reducers/activityReducer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { userLoggedIn } from "../redux/reducers/loginReducer";
+import { addLogInUser } from "../redux/reducers/loggingInReducer";
 
 function Login({ navigation }) {
   const dispatch = useDispatch();
@@ -38,12 +39,9 @@ function Login({ navigation }) {
     formState: { errors },
   } = useForm();
 
-  useFonts({
-    QuickSandRegular: require("../assets/fonts/Quicksand-Light.ttf"),
-  });
-
   const onSubmit = (data) => {
     dispatch(startLoader());
+    dispatch(addLogInUser(data.email));
     sendRequest("post", "login", {
       ...data,
       password: data.password,
@@ -60,6 +58,11 @@ function Login({ navigation }) {
           }, 2000);
         } else {
           showToast(res.error);
+          if (res.verify) {
+            setTimeout(() => {
+              navigation.navigate("Verify");
+            }, 1000);
+          }
         }
       })
       .catch((err) => {
@@ -124,7 +127,6 @@ const style = StyleSheet.create({
   },
   text: {
     textAlign: "left",
-    fontFamily: "QuickSandRegular",
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 45,

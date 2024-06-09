@@ -1,7 +1,6 @@
 import {
   View,
   ScrollView,
-  Text,
   StyleSheet,
   ImageBackground,
   Dimensions,
@@ -42,6 +41,7 @@ function Orders() {
             {orders &&
               orders.map((item, i) => (
                 <OrderCard
+                  key={i}
                   sr={i + 1}
                   name={item.name}
                   date={item.orderDate}
